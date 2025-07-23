@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🌦️ Qadir Live Weather</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>🌍 Qadir Live Weather</h1>
+
+    <form method="POST">
+      <input type="text" name="city" placeholder="Enter city" required />
+      <button type="submit">Search</button>
+    </form>
+
+    <div>
+      <button onclick="toggleUnits()">Switch to {{ 'Fahrenheit' if units == 'metric' else 'Celsius' }}</button>
+      <button onclick="getLocation()">📍 Use My Location</button>
+    </div>
+
+    {% if weather %}
+    <div class="card">
+      <h2>{{ weather.city }}</h2>
+      <img src="http://openweathermap.org/img/wn/{{ weather.icon }}@2x.png" alt="icon">
+      <p><strong>{{ weather.temp }}°{{ 'C' if units == 'metric' else 'F' }}</strong> | {{ weather.description }}</p>
+      <p>💧 Humidity: {{ weather.humidity }}%</p>
+      <p>💨 Wind: {{ weather.wind }} {{ 'km/h' if units == 'metric' else 'mph' }}</p>
+    </div>
+
+    <div class="forecast">
+      <h3>5-Day Forecast</h3>
+      <div class="days">
+        {% for day in forecast %}
+        <div class="forecast-day">
+          <p>{{ day.date }}</p>
+          <img src="http://openweathermap.org/img/wn/{{ day.icon }}@2x.png" />
+          <p>{{ day.temp }}°</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <canvas id="tempChart" width="300" height="100"></canvas>
+    <script>
+      const ctx = document.getElementById('tempChart');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [{% for day in forecast %}'{{ day.date }}',{% endfor %}],
+          datasets: [{
+            label: 'Temperature Trend ({{ '°C' if units == 'metric' else '°F' }})',
+            data: [{% for day in forecast %}{{ day.temp }},{% endfor %}],
+            borderColor: 'rgba(0, 199, 255, 1)',
+            backgroundColor: 'rgba(0,199,255,0.2)',
+            tension: 0.4,
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: false
+            }
+          }
+        }
+      });
+    </script>
+    {% endif %}
+  </div>
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
+

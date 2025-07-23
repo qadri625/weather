@@ -1,0 +1,8 @@
+services:
+  weather-app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - OPENWEATHER_API_KEY=626ff24f9f9eeebb817395d4fd968695
+
